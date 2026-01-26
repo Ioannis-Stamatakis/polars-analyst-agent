@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# Project context (for Claude AI)
+CLAUDE.md
+
 # Python
 __pycache__/
 *.py[cod]

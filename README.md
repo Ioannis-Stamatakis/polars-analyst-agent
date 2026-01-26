@@ -1,352 +1,463 @@
-# Data Analysis Code Generator with smolagents
+<div align="center">
 
-An AI-powered data analysis agent that loads CSV files with Polars, inspects actual data, and generates tailored analysis code that it executes and validates.
+# 🔍 Polars Analyst Agent
 
-## Why This Uses smolagents (Not Just an LLM)
+**AI-powered data analysis agent that inspects real CSV data and generates tailored Polars analysis code.**
 
-This project demonstrates the power of **agentic AI** vs simple LLM prompting:
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
+[![smolagents](https://img.shields.io/badge/smolagents-1.24+-orange.svg)](https://github.com/huggingface/smolagents)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-- 🔍 **Grounded in Reality**: Agent inspects actual CSV data before generating code
-- 🔄 **Execution Feedback Loop**: Generates code → Executes → Reads errors → Debugs → Regenerates
-- 🛠️ **Tool Orchestration**: Intelligently sequences: Load → Inspect → Profile → Generate → Execute
-- 🎯 **Context-Aware**: Adapts code to discovered data characteristics (dtypes, nulls, distributions)
-- 🔁 **Intelligent Recovery**: Reads tracebacks, understands issues, makes targeted fixes
+Built with [smolagents](https://github.com/huggingface/smolagents) • [Gemini API](https://ai.google.dev) • [Polars](https://pola.rs)
 
-**LLM alone**: Generates code blindly based on generic assumptions
-**Agent with smolagents**: Inspects YOUR data, generates tailored code, validates it works
+[Features](#-features) • [Quick Start](#-quick-start) • [How It Works](#-how-it-works) • [Documentation](#-project-structure)
 
-## Features
+</div>
+
+---
+
+## 🎯 The Problem
+
+Most AI coding tools generate code **blindly**:
+
+<table>
+<tr>
+<td width="50%">
+
+### ❌ Traditional LLM Approach
+```
+User: "Analyze my data"
+  ↓
+LLM generates generic code
+  ↓
+Assumes column names
+Assumes data types
+Assumes no nulls
+  ↓
+User runs code → Often fails ❌
+User debugs → Wastes time 😞
+```
+
+</td>
+<td width="50%">
+
+### ✅ Agent Approach (This Project)
+```
+User: "Analyze my data"
+  ↓
+Agent loads & inspects CSV
+Agent discovers actual columns
+Agent detects nulls, types
+  ↓
+Generates tailored code
+Executes in sandbox
+Handles errors automatically
+  ↓
+Returns working results ✨
+```
+
+</td>
+</tr>
+</table>
+
+## 🚀 What Makes This Agentic?
+
+<div align="center">
+
+| Feature | LLM Only | This Agent |
+|:--------|:--------:|:----------:|
+| **Data Awareness** | Blind guessing 🙈 | Inspects actual CSV 🔍 |
+| **Code Execution** | User must run 👤 | Automatic sandbox ⚡ |
+| **Error Handling** | User debugs 🐛 | Self-corrects 🔄 |
+| **Tool Usage** | None 🚫 | 3 custom tools 🛠️ |
+| **Validation** | No verification ❓ | Validates before return ✅ |
+| **Iteration** | One-shot 1️⃣ | Loops until success 🔁 |
+
+</div>
+
+**Result:** Code that **actually works** on YOUR data, not generic boilerplate.
+
+---
+
+## ✨ Features
 
 ### Core Capabilities
-- 📊 Intelligent CSV loading with auto-detection (encoding, separators)
-- 🔬 Comprehensive data inspection (schema, nulls, statistics)
-- 📈 Deep profiling (distributions, correlations, outliers)
-- 🤖 Context-aware code generation (adapts to actual data)
-- ✅ Execution validation with error recovery
-- 🎨 Smart visualization selection by data type
 
-### Advanced Features
-- Natural language queries ("Show distribution of ages")
-- Multi-file comparison
-- Anomaly detection
-- Code explanation for educational value
-- Export options (code files, reports, visualizations)
+🔧 **Robust CSV Loading**
+- Auto-detects encoding (UTF-8, Latin-1, ISO-8859-1)
+- Auto-detects separators (comma, semicolon, tab, pipe)
+- Handles malformed CSVs gracefully
 
-## Installation
+📊 **Intelligent Data Inspection**
+- Analyzes schema without assumptions
+- Detects null counts and unique values
+- Classifies column types (numeric, categorical, temporal)
+
+🧮 **Deep Data Profiling**
+- Computes statistics and distributions
+- Detects correlations and outliers
+- Recommends appropriate visualizations
+
+🤖 **Smart Code Generation**
+- Generates Polars code tailored to actual data
+- Adapts based on discovered characteristics
+- Includes null handling based on findings
+
+🔒 **Safe Execution**
+- Sandboxed Python environment
+- Whitelisted imports only
+- Captures errors and output
+
+♻️ **Error Recovery**
+- Reads execution errors
+- Understands the issue
+- Regenerates and retries automatically
+
+📈 **Automatic Visualization**
+- Creates matplotlib/seaborn plots
+- Saves results to PNG files
+
+### Why This Matters for Portfolios
+
+✅ **Production-Ready**: Shows understanding of agentic AI patterns
+✅ **Tool Integration**: Custom tool creation with smolagents
+✅ **Error Handling**: Real feedback loops and self-correction
+✅ **Security**: Sandboxed execution with import whitelisting
+✅ **Extensibility**: Clean architecture for adding tools
+
+---
+
+## 🏃 Quick Start
+
+### 1️⃣ Setup
 
 ```bash
-# Clone the repository
-git clone <repo-url>
-cd data-analysis-agent
+# Clone repository
+git clone git@github.com:Ioannis-Stamatakis/polars-analyst-agent.git
+cd polars-analyst-agent
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Set up your Gemini API key
+# Configure API key
 cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY
+# Edit .env and add your GEMINI_API_KEY from https://ai.google.dev/
 ```
 
-## Quick Start
-
-### Option 1: Command Line
+### 2️⃣ Run Example
 
 ```bash
-# Analyze a CSV file
+# Analyze sample sales data
 python -m src.agent_controller examples/sample_datasets/sales_data.csv
 
-# With custom task
-python -m src.agent_controller examples/sample_datasets/customer_data.csv \
-  --task "Show me the correlation between age and income"
-
-# Interactive mode
-python -m src.agent_controller --interactive
+# Or with specific task
+python -m src.agent_controller examples/sample_datasets/sales_data.csv \
+  --task "Show which region has highest sales"
 ```
 
-### Option 2: Python API
+### 3️⃣ Analyze Your Data
+
+```bash
+# Simple usage
+python -m src.agent_controller your_data.csv
+
+# Custom task
+python -m src.agent_controller your_data.csv \
+  --task "Find correlations between columns"
+
+# Verbose mode (see agent reasoning)
+python -m src.agent_controller your_data.csv --verbose
+```
+
+### 4️⃣ Use as Library
 
 ```python
 from src.agent_controller import DataAnalysisAgent
 
-# Initialize agent
-agent = DataAnalysisAgent(
-    model_name="gemini/gemini-2.0-flash-exp",
-    api_key="your-api-key"  # Or set GEMINI_API_KEY env var
-)
+agent = DataAnalysisAgent()  # Uses GEMINI_API_KEY from .env
 
-# Run analysis
 result = agent.analyze(
     csv_path="data/sales.csv",
-    task="Perform comprehensive exploratory analysis"
+    task="Show sales trends and regional performance"
 )
+
+print(result)
 ```
 
-### Option 3: Run Examples
+---
 
-```bash
-# Run all examples
-python examples/example_usage.py
+## 🔄 How It Works
 
-# Run specific example
-python examples/example_usage.py --example 1  # Sales analysis
-python examples/example_usage.py --example 2  # Customer analysis
-python examples/example_usage.py --example 3  # Custom query
-python examples/example_usage.py --example 4  # Interactive mode
+### The Agent Loop
+
+```mermaid
+graph TB
+    A[👤 User Input<br/>CSV + Task] --> B[📥 Load & Inspect<br/>PolarsDataLoaderTool]
+    B --> C[🔍 Analyze Data<br/>DataInspectorTool + DataProfilerTool]
+    C --> D[💡 Generate Code<br/>Agent Reasoning via Gemini]
+    D --> E[▶️ Execute Code<br/>PythonInterpreterTool]
+    E --> F{✅ Success?}
+    F -->|Yes| G[📊 Return Results<br/>+ Visualizations]
+    F -->|No| H[🔧 Fix Error]
+    H --> D
+
+    style A fill:#e1f5ff
+    style G fill:#c8e6c9
+    style F fill:#fff9c4
+    style H fill:#ffccbc
 ```
 
-## How It Works
+<details>
+<summary><b>📋 Step-by-Step Process</b></summary>
 
-### Agent Workflow
+1. **Load & Inspect** - Agent loads CSV, detects encoding, gets schema
+2. **Analyze** - Computes statistics, correlations, distributions, outliers
+3. **Generate** - Writes Polars code based on ACTUAL data findings
+4. **Execute** - Runs code in sandbox, captures output and errors
+5. **Validate** - If error occurs, reads traceback and regenerates
+6. **Return** - Provides working code + visualizations + insights
 
-```
-1. LOAD DATA (PolarsDataLoaderTool)
-   ├─> Robust CSV loading with auto-detection
-   ├─> Error handling for encoding/separator issues
-   └─> Returns shape, columns, preview
+*Max 8 iterations for efficiency*
 
-2. INSPECT DATA (DataInspectorTool)
-   ├─> Analyzes schema (dtypes, nulls, unique counts)
-   ├─> Computes basic statistics
-   └─> Identifies data quality issues
+</details>
 
-3. PROFILE DATA (DataProfilerTool)
-   ├─> Deep profiling (distributions, correlations)
-   ├─> Outlier detection
-   ├─> Cardinality analysis
-   └─> Returns visualization recommendations
+---
 
-4. GENERATE CODE (Agent Reasoning)
-   ├─> Creates Polars code based on ACTUAL data
-   ├─> Handles nulls discovered during inspection
-   ├─> Selects appropriate visualizations
-   └─> Includes insights extraction
-
-5. EXECUTE & VALIDATE (PythonInterpreterTool)
-   ├─> Runs code in safe sandbox
-   ├─> If error: reads traceback → debugs → regenerates
-   └─> Iterates until working code produced
-
-6. PRESENT RESULTS
-   ├─> Formats findings
-   ├─> Shows visualizations
-   └─> Explains insights
-```
-
-### Example: Agent in Action
-
-```python
-# User provides CSV path
-agent.analyze("sales_data.csv", task="Analyze sales trends")
-
-# Agent's thought process (automatic):
-# 1. "Let me load this CSV first"
-#    → Calls: polars_data_loader("sales_data.csv")
-#    → Discovers: 25 rows, columns [date, product, region, sales_amount, units_sold]
-
-# 2. "Now let me inspect the structure"
-#    → Calls: data_inspector("sales_data.csv")
-#    → Discovers: 2 null values in sales_amount, sales_amount is numeric,
-#                 product and region are categorical
-
-# 3. "Let me profile the data deeply"
-#    → Calls: data_profiler("sales_data.csv")
-#    → Discovers: Strong correlation between units_sold and sales_amount,
-#                 3 products, 4 regions, no major outliers
-
-# 4. "Based on what I found, I'll generate tailored code"
-#    → Generates Polars code that:
-#      - Handles the 2 null values in sales_amount
-#      - Creates time series plot (found date column)
-#      - Creates bar chart by product (found categorical)
-#      - Computes sales by region
-#      - Shows correlation plot
-
-# 5. "Let me execute this code"
-#    → Calls: python_interpreter(generated_code)
-#    → If error: "Hmm, got an error. Let me fix it..."
-#    → Re-generates and re-executes until success
-
-# 6. "Here are your results with visualizations!"
-```
-
-## Project Structure
+## 🏗️ Architecture
 
 ```
-data-analysis-agent/
-├── README.md                        # This file
-├── requirements.txt                 # Python dependencies
-├── .env.example                     # Environment variables template
+src/
+├── 🎮 agent_controller.py       # Main orchestration & CLI
+├── 🛠️ tools/
+│   ├── data_loader.py           # CSV loading with auto-detection
+│   ├── data_inspector.py        # Schema & null analysis
+│   └── data_profiler.py         # Statistical profiling
+├── 🔒 execution/
+│   └── authorized_imports.py    # Safe execution whitelist
+├── 🎨 formatters/
+│   └── result_formatter.py      # Rich CLI output
+└── 💬 prompts/
+    └── system_prompts.py        # Agent behavior instructions
+```
+
+---
+
+## 📦 Project Structure
+
+```
+polars-analyst-agent/
+├── 📄 README.md                     # This file
+├── 📋 requirements.txt              # Dependencies
+├── 🔐 .env.example                  # API key template
 │
-├── src/
-│   ├── agent_controller.py          # Main orchestration & CLI
+├── 🧠 src/                          # Core agent code
+│   ├── agent_controller.py
 │   ├── tools/
-│   │   ├── data_loader.py          # PolarsDataLoaderTool
-│   │   ├── data_inspector.py       # DataInspectorTool
-│   │   └── data_profiler.py        # DataProfilerTool
 │   ├── execution/
-│   │   └── authorized_imports.py   # Safe execution config
 │   ├── formatters/
-│   │   └── result_formatter.py     # Rich formatting
 │   └── prompts/
-│       └── system_prompts.py       # Agent instructions
 │
-├── examples/
+├── 📚 examples/                     # Example usage
 │   ├── sample_datasets/
-│   │   ├── sales_data.csv          # Example sales data
-│   │   └── customer_data.csv       # Example customer data
-│   └── example_usage.py            # Demo scripts
+│   │   ├── sales_data.csv          # 25 rows, sales data
+│   │   └── customer_data.csv       # 25 rows, customer data
+│   └── example_usage.py
 │
-├── tests/
-│   └── test_integration.py         # Integration tests
+├── 🧪 tests/                        # Integration tests
+│   └── test_integration.py
 │
-└── outputs/                         # Generated analyses
-    ├── code/                        # Saved code files
-    ├── visualizations/              # Saved plots
-    └── reports/                     # Markdown reports
+└── 📊 outputs/                      # Generated results
+    ├── code/
+    ├── visualizations/
+    └── reports/
 ```
 
-## Dependencies
+---
 
-- **smolagents**: Agent framework with tool orchestration
-- **litellm**: Unified LLM interface (supports Gemini, OpenAI, etc.)
-- **polars**: Fast DataFrame library for data manipulation
-- **numpy**: Numerical computing
-- **matplotlib/seaborn**: Visualization libraries
-- **rich**: Beautiful CLI formatting
-- **python-dotenv**: Environment variable management
+## 🎓 Why This Showcases smolagents Mastery
 
-## Configuration
+### 1. **Tool Orchestration & Planning**
+Agent follows intelligent sequence: `Load → Inspect → Profile → Generate → Execute → Validate`
 
-### Environment Variables
+This demonstrates **multi-step reasoning**, not just prompt engineering.
 
-Create a `.env` file:
+### 2. **Execution Feedback Loop** *(Core of Agentic AI)*
+
+<table>
+<tr>
+<td width="50%">
+
+**Traditional LLM**
+```
+Prompt
+  ↓
+Generate code
+  ↓
+(User runs it)
+  ↓
+Might fail ❌
+User debugs
+```
+
+</td>
+<td width="50%">
+
+**This Agent**
+```
+Load data
+  ↓
+Analyze
+  ↓
+Generate
+  ↓
+Execute
+  ↓
+Error? → Fix → Re-execute ✅
+```
+
+</td>
+</tr>
+</table>
+
+Agent **learns from execution results** - that's what makes it an agent.
+
+### 3. **Dynamic Decision Making**
+
+Agent adapts code based on what it discovers:
+- **Date columns** → Time series analysis
+- **Categorical** → Group-by aggregations
+- **Nulls detected** → Null handling logic
+- **Correlations** → Correlation visualizations
+
+**Grounded reasoning**, not templated code.
+
+### 4. **Safe Execution**
+- ✅ Sandboxed environment
+- ✅ Whitelisted imports
+- ✅ Error capture & handling
+- ✅ Security best practices
+
+### 5. **Custom Tool Development**
+
+Not just using defaults - creates 3 domain-specific tools:
+- `PolarsDataLoaderTool` - CSV loading expertise
+- `DataInspectorTool` - Schema analysis
+- `DataProfilerTool` - Statistical profiling
+
+Shows ability to **extend smolagents** framework.
+
+---
+
+## ✅ Verification
 
 ```bash
-GEMINI_API_KEY=your-gemini-api-key-here
-```
+# Test with sample data
+python -m src.agent_controller examples/sample_datasets/sales_data.csv
 
-### Agent Parameters
+# Try different data (notice how analysis changes)
+python -m src.agent_controller examples/sample_datasets/customer_data.csv
 
-```python
-agent = DataAnalysisAgent(
-    model_name="gemini/gemini-2.0-flash-exp",  # LiteLLM model ID
-    api_key="...",                              # API key (optional if in env)
-    max_steps=20,                               # Max agentic iterations
-    verbosity_level=1                           # 0=silent, 1=normal, 2=verbose
-)
-```
-
-## Why This Showcases smolagents
-
-### 1. Tool Orchestration
-The agent follows a logical workflow: Load → Inspect → Profile → Generate → Execute. This demonstrates multi-step reasoning and planning that requires an agent framework.
-
-### 2. Execution Feedback Loop
-Unlike a simple LLM that generates code blindly:
-- **LLM**: Generates code → User runs it → May fail
-- **Agent**: Generates → Executes → Reads errors → Debugs → Regenerates → Validates
-
-### 3. Grounded in Actual Data
-The agent MUST inspect real CSV files to know:
-- What dtypes exist (numeric, categorical, dates)
-- Which columns have nulls
-- What visualizations are appropriate
-- Whether correlations exist
-
-This requires tool usage - an LLM alone can't access files.
-
-### 4. Dynamic Decision Making
-The agent adapts based on discoveries:
-- Timestamps → time series analysis
-- High cardinality categorical → different viz strategy
-- Many nulls → include imputation
-- Correlations → add correlation matrix
-
-### 5. Intelligent Error Recovery
-When code fails, the agent:
-- Reads the traceback
-- Understands the specific issue (not just "try again")
-- Makes targeted fixes
-- Re-executes to validate
-
-## Verification
-
-To verify the agent is working correctly:
-
-```bash
 # Run tests
-python -m pytest tests/
-
-# Or manually verify:
-python examples/example_usage.py --example 1
+python -m pytest tests/ -v
 ```
 
-**Check that the agent:**
-1. ✅ Calls tools in correct sequence (never generates code before inspecting)
-2. ✅ Successfully recovers from execution errors
-3. ✅ Generates different code for different data types
-4. ✅ Uses Polars (not pandas) in all generated code
-5. ✅ Produces working, executable analysis code
+**What to verify:**
+1. ✅ Agent inspects data first (not blind generation)
+2. ✅ Different CSVs get different analysis
+3. ✅ Errors are automatically fixed
+4. ✅ Visualizations created (PNG files)
+5. ✅ Uses Polars, respects safety constraints
 
-## Example Output
+---
+
+## 📊 Example Output
 
 ```
 → Starting Analysis
   File: examples/sample_datasets/sales_data.csv
-  Task: Perform comprehensive exploratory data analysis
 
 [Agent loads data...]
-CSV LOADED SUCCESSFULLY
-Shape: 25 rows × 6 columns
+Shape: 25 rows, 6 columns
+Columns: date, product, region, sales_amount, units_sold, customer_type
 
-[Agent inspects data...]
-Found 2 null values in sales_amount column
-Identified 3 numeric columns, 3 categorical columns
+[Agent inspects...]
+Found 2 nulls in sales_amount
+Identified 2 numeric, 4 categorical columns
 
-[Agent profiles data...]
-Strong correlation between units_sold and sales_amount (r=0.87)
-Recommending: time series plot, bar charts, correlation heatmap
+[Agent profiles...]
+Correlation: units_sold ↔ sales_amount (r=0.87)
+Recommends: time series, bar charts, heatmap
 
-[Agent generates code...]
-Generated Polars analysis code with:
-- Null handling for sales_amount
-- Sales trends over time
-- Revenue by product and region
-- Correlation analysis
-
-[Agent executes code...]
+[Agent generates & executes code...]
 ✓ Code executed successfully
 
-Analysis Complete
-═════════════════
-Generated 3 visualizations:
-  📊 outputs/visualizations/sales_trends.png
-  📊 outputs/visualizations/revenue_by_product.png
-  📊 outputs/visualizations/correlation_heatmap.png
+╭─────────────────────────────────╮
+│      Analysis Complete          │
+╰─────────────────────────────────╯
 
-Key Insights:
-  • Widget C generates highest revenue ($23,580)
-  • North region leads in sales volume
-  • Strong positive correlation between units and revenue
+📊 Generated visualizations:
+  • sales_by_region.png
+  • product_revenue.png
+  • correlation_matrix.png
+
+💡 Key Insights:
+  • Widget C: highest revenue ($14,631)
+  • North region: best performing
+  • Strong units-revenue correlation
 ```
 
-## Contributing
+---
 
-Contributions welcome! Areas for improvement:
-- Additional tool implementations (SQL databases, APIs)
-- More sophisticated error recovery strategies
-- Multi-file comparative analysis
-- Real-time data streaming support
-- Export to various formats (PDF reports, interactive dashboards)
+## 🛠️ Tech Stack
 
-## License
+| Technology | Purpose |
+|:-----------|:--------|
+| [smolagents](https://github.com/huggingface/smolagents) | Agent framework & tool orchestration |
+| [LiteLLM](https://github.com/BerriAI/litellm) | Unified LLM interface |
+| [Gemini 2.0](https://ai.google.dev) | Google's generative AI |
+| [Polars](https://pola.rs) | High-performance DataFrames |
+| [Matplotlib](https://matplotlib.org) / [Seaborn](https://seaborn.pydata.org) | Visualizations |
+| [Rich](https://github.com/Textualize/rich) | Beautiful CLI output |
 
-MIT License - See LICENSE file for details
+---
 
-## Acknowledgments
+## 🤝 Contributing
+
+Contributions welcome! Potential extensions:
+
+- 🗄️ SQL database support
+- 📡 Streaming data analysis
+- 📈 Advanced visualization options
+- 🔀 Multi-file comparisons
+- 📄 PDF report generation
+- 📊 Excel/JSON/Parquet support
+
+---
+
+## 📄 License
+
+MIT License
+
+---
+
+## 🙏 Acknowledgments
 
 Built with:
-- [smolagents](https://github.com/huggingface/smolagents) - Hugging Face's agent framework
-- [LiteLLM](https://github.com/BerriAI/litellm) - Unified LLM interface
-- [Polars](https://pola.rs) - Lightning-fast DataFrame library
-- [Gemini](https://ai.google.dev) - Google's generative AI model
+- [smolagents](https://github.com/huggingface/smolagents) by Hugging Face
+- [LiteLLM](https://github.com/BerriAI/litellm) by BerriAI
+- [Polars](https://pola.rs) by Ritchie Vink
+- [Gemini 2.0](https://ai.google.dev) by Google
+
+---
+
+<div align="center">
+
+**⭐ Star this repo if you find it useful!**
+
+Made with ❤️ using agentic AI
+
+</div>
