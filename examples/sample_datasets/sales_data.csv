@@ -1,0 +1,26 @@
+date,product,region,sales_amount,units_sold,customer_type
+2024-01-01,Widget A,North,1250.50,25,Retail
+2024-01-01,Widget B,South,890.00,15,Wholesale
+2024-01-02,Widget A,East,1450.75,30,Retail
+2024-01-02,Widget C,West,2100.00,40,Retail
+2024-01-03,Widget B,North,750.25,12,Wholesale
+2024-01-03,Widget A,South,1600.00,32,Retail
+2024-01-04,Widget C,East,1950.50,38,Wholesale
+2024-01-04,Widget B,West,820.00,14,Retail
+2024-01-05,Widget A,North,1380.25,28,Retail
+2024-01-05,Widget C,South,2250.75,45,Wholesale
+2024-01-06,Widget B,East,910.00,16,Retail
+2024-01-06,Widget A,West,1520.50,31,Wholesale
+2024-01-07,Widget C,North,2050.00,41,Retail
+2024-01-07,Widget B,South,780.25,13,Retail
+2024-01-08,Widget A,East,1420.75,29,Wholesale
+2024-01-08,Widget C,West,2180.00,43,Retail
+2024-01-09,Widget B,North,850.50,15,Retail
+2024-01-09,Widget A,South,1550.00,32,Retail
+2024-01-10,Widget C,East,1980.25,39,Wholesale
+2024-01-10,Widget B,West,,14,Retail
+2024-01-11,Widget A,North,1400.00,28,Retail
+2024-01-11,Widget C,South,,44,Wholesale
+2024-01-12,Widget B,East,920.75,17,Retail
+2024-01-12,Widget A,West,1580.50,33,Wholesale
+2024-01-13,Widget C,North,2120.00,42,Retail
