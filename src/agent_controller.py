@@ -10,6 +10,7 @@ from smolagents import CodeAgent, LiteLLMModel, PythonInterpreterTool, tool
 from src.tools.data_loader import PolarsDataLoaderTool
 from src.tools.data_inspector import DataInspectorTool
 from src.tools.data_profiler import DataProfilerTool
+from src.tools.data_validator import DataValidatorTool
 from src.prompts.system_prompts import DATA_ANALYSIS_TASK_TEMPLATE
 from src.formatters.result_formatter import ResultFormatter
 from src.execution.authorized_imports import AUTHORIZED_IMPORTS
@@ -66,6 +67,7 @@ class DataAnalysisAgent:
             PolarsDataLoaderTool(),
             DataInspectorTool(),
             DataProfilerTool(),
+            DataValidatorTool(),  # Validates data quality and provides code recommendations
         ]
 
         # Initialize agent with authorized imports

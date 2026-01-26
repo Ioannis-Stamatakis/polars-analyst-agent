@@ -1,0 +1,26 @@
+employee_id,department,position,salary,years_experience,performance_rating,location
+E001,Engineering,Senior Developer,95000,8,Excellent,New York
+E002,Sales,Account Manager,72000,5,Good,Los Angeles
+E003,Engineering,Junior Developer,65000,2,Good,New York
+E004,Marketing,Marketing Manager,85000,7,Excellent,Chicago
+E005,Sales,Sales Representative,58000,3,Average,Los Angeles
+E006,Engineering,Lead Developer,110000,12,Excellent,New York
+E007,HR,HR Manager,78000,6,Good,Chicago
+E008,Engineering,Senior Developer,98000,9,Excellent,New York
+E009,Marketing,Content Specialist,62000,4,Good,Chicago
+E010,Sales,Account Manager,75000,6,Excellent,Los Angeles
+E011,Engineering,Junior Developer,63000,1,Average,New York
+E012,Marketing,Marketing Specialist,68000,5,Good,Chicago
+E013,Sales,Sales Manager,92000,10,Excellent,Los Angeles
+E014,Engineering,Developer,82000,6,Good,New York
+E015,HR,HR Specialist,59000,3,Good,Chicago
+E016,Sales,Sales Representative,56000,2,Average,Los Angeles
+E017,Engineering,Senior Developer,96000,8,Excellent,New York
+E018,Marketing,Marketing Manager,87000,8,Excellent,Chicago
+E019,Sales,Account Manager,74000,5,Good,Los Angeles
+E020,Engineering,Lead Developer,115000,13,Excellent,New York
+E021,HR,HR Manager,80000,7,Excellent,Chicago
+E022,Marketing,Content Specialist,64000,4,Good,Chicago
+E023,Sales,Sales Representative,60000,3,Average,Los Angeles
+E024,Engineering,Junior Developer,66000,2,Good,New York
+E025,Marketing,Marketing Specialist,69000,5,Excellent,Chicago

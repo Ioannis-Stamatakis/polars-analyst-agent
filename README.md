@@ -263,8 +263,9 @@ polars-analyst-agent/
 │
 ├── 📚 examples/                     # Example usage
 │   ├── sample_datasets/
-│   │   ├── sales_data.csv          # 25 rows, sales data
-│   │   └── customer_data.csv       # 25 rows, customer data
+│   │   ├── sales_data.csv          # 25 rows, sales data (mixed types)
+│   │   ├── customer_data.csv       # 25 rows, customer demographics
+│   │   └── employee_data.csv       # 30 rows, heavy categorical
 │   └── example_usage.py
 │
 ├── 🧪 tests/                        # Integration tests
