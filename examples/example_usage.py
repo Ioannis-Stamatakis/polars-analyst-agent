@@ -20,7 +20,7 @@ def example_1_sales_analysis():
 
     # Initialize agent
     agent = DataAnalysisAgent(
-        model_name="gemini/gemini-2.0-flash-exp",
+        model_name="gemini/gemini-2.5-flash",
         verbosity_level=1
     )
 
@@ -50,7 +50,7 @@ def example_2_customer_analysis():
     print("=" * 60)
 
     agent = DataAnalysisAgent(
-        model_name="gemini/gemini-2.0-flash-exp",
+        model_name="gemini/gemini-2.5-flash",
         verbosity_level=1
     )
 
@@ -79,7 +79,7 @@ def example_3_custom_query():
     print("=" * 60)
 
     agent = DataAnalysisAgent(
-        model_name="gemini/gemini-2.0-flash-exp",
+        model_name="gemini/gemini-2.5-flash",
         verbosity_level=1
     )
 
@@ -105,7 +105,7 @@ def example_4_interactive_mode():
     print("=" * 60)
 
     agent = DataAnalysisAgent(
-        model_name="gemini/gemini-2.0-flash-exp",
+        model_name="gemini/gemini-2.5-flash",
         verbosity_level=1
     )
 

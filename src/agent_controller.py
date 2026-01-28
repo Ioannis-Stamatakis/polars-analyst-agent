@@ -2,6 +2,7 @@
 Agent Controller: Main orchestration of the data analysis agent.
 """
 import os
+import time
 from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 
@@ -31,7 +32,7 @@ class DataAnalysisAgent:
 
     def __init__(
         self,
-        model_name: str = "gemini/gemini-2.0-flash-exp",
+        model_name: str = "gemini/gemini-2.5-flash",
         api_key: Optional[str] = None,
         max_steps: int = 8,
         verbosity_level: int = 1
@@ -62,6 +63,10 @@ class DataAnalysisAgent:
             api_key=os.getenv("GEMINI_API_KEY")
         )
 
+        # Store agent parameters for reuse during retries
+        self.max_steps = max_steps
+        self.verbosity_level = verbosity_level
+
         # Initialize tools (without PythonInterpreterTool - CodeAgent creates it)
         self.tools = [
             PolarsDataLoaderTool(),
@@ -85,14 +90,18 @@ class DataAnalysisAgent:
     def analyze(
         self,
         csv_path: str,
-        task: str = "Perform comprehensive exploratory data analysis"
+        task: str = "Perform comprehensive exploratory data analysis",
+        max_retries: int = 3,
+        retry_delay: float = 4.0
     ) -> str:
         """
-        Run data analysis on a CSV file.
+        Run data analysis on a CSV file with retry logic for API overload.
 
         Args:
             csv_path: Path to the CSV file to analyze
             task: Description of the analysis task
+            max_retries: Maximum number of retries on 503 errors
+            retry_delay: Base delay in seconds between retries
 
         Returns:
             Analysis results as a string
@@ -115,19 +124,41 @@ class DataAnalysisAgent:
             f"File: {csv_path}\nTask: {task}"
         )
 
-        try:
-            # Run the agent
-            result = self.agent.run(full_task)
+        # Retry loop for handling API overload
+        for attempt in range(max_retries + 1):
+            try:
+                # Run the agent
+                result = self.agent.run(full_task)
 
-            # Format and display result
-            self.formatter.format_agent_result(result)
+                # Format and display result
+                self.formatter.format_agent_result(result)
 
-            return result
+                return result
 
-        except Exception as e:
-            error_msg = f"Analysis failed: {str(e)}"
-            self.formatter.print_error(error_msg)
-            return error_msg
+            except Exception as e:
+                error_str = str(e)
+                # Check if it's a 503 overload error
+                is_overload = "503" in error_str or "UNAVAILABLE" in error_str or "overloaded" in error_str.lower()
+
+                if is_overload and attempt < max_retries:
+                    wait_time = retry_delay * (2 ** attempt)  # Exponential backoff
+                    self.formatter.console.print(
+                        f"[yellow]Model overloaded (attempt {attempt + 1}/{max_retries + 1}). "
+                        f"Waiting {wait_time:.1f}s before retry...[/yellow]"
+                    )
+                    time.sleep(wait_time)
+                    # Reset agent for next attempt
+                    self.agent = CodeAgent(
+                        tools=self.tools,
+                        model=self.model,
+                        max_steps=self.max_steps,
+                        verbosity_level=self.verbosity_level,
+                        additional_authorized_imports=AUTHORIZED_IMPORTS
+                    )
+                else:
+                    error_msg = f"Analysis failed: {str(e)}"
+                    self.formatter.print_error(error_msg)
+                    return error_msg
 
     def analyze_interactive(self):
         """
@@ -193,7 +224,7 @@ def main():
     )
     parser.add_argument(
         "--model",
-        default="gemini/gemini-2.0-flash-exp",
+        default="gemini/gemini-2.5-flash",
         help="LiteLLM model identifier"
     )
     parser.add_argument(
