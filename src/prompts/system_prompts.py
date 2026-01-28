@@ -21,11 +21,29 @@ KEY RULES FOR POLARS:
   * DON'T: Complex chained expressions with .then()/.otherwise() - these often fail
   * DO: Simple operations, drop nulls if causing issues
 
+VISUALIZATION RULES - CRITICAL:
+- plt.show() does NOT work in this environment - figures will NOT display
+- MUST save every plot: plt.savefig("descriptive_name.png", dpi=100, bbox_inches='tight')
+- Call plt.savefig() BEFORE plt.close(), NEVER call plt.show()
+- NEVER use .to_pandas() - always work with Polars native or extract to lists
+- For plots with Polars DataFrames:
+  * Extract to lists: x_data = df["col"].to_list()
+  * For grouped data: groups = result.to_dicts(), then x = [d["col"] for d in groups]
+  * Use matplotlib.pyplot: plt.bar(x_list, y_list)
+  * For colors: import matplotlib.cm as cm, then use cm.viridis(...)
+- Pattern for every plot:
+  1. plt.figure()
+  2. Create the plot with extracted data
+  3. plt.savefig("name.png", dpi=100, bbox_inches='tight')
+  4. plt.close()
+- Never skip plt.savefig() - it's the ONLY way to get output
+
 SIMPLICITY RULES:
 - If nulls exist and cause errors, just drop them: df = df.drop_nulls()
 - Don't overthink - simple code works best
 - One operation at a time
 - Test prints to verify data before complex operations
+- Avoid .to_pandas() - work with Polars native or extract to lists
 
 ERROR RECOVERY:
 - Read the EXACT error message
