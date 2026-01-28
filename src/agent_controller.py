@@ -33,7 +33,7 @@ class DataAnalysisAgent:
 
     def __init__(
         self,
-        model_name: str = "gemini/gemini-2.5-flash",
+        model_name: str = "gemini/gemini-3-flash",
         api_key: Optional[str] = None,
         max_steps: int = 12,
         verbosity_level: int = 1
@@ -42,7 +42,7 @@ class DataAnalysisAgent:
         Initialize the data analysis agent.
 
         Args:
-            model_name: LiteLLM model identifier (default: Gemini 2.0 Flash)
+            model_name: LiteLLM model identifier (default: Gemini 3 Flash)
             api_key: Gemini API key (reads from GEMINI_API_KEY env var if not provided)
             max_steps: Maximum agentic steps before stopping
             verbosity_level: 0=silent, 1=normal, 2=verbose
@@ -242,7 +242,7 @@ def main():
     )
     parser.add_argument(
         "--model",
-        default="gemini/gemini-2.5-flash",
+        default="gemini/gemini-3-flash",
         help="LiteLLM model identifier"
     )
     parser.add_argument(
