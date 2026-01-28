@@ -7,12 +7,13 @@ from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 
 from smolagents import CodeAgent, LiteLLMModel, PythonInterpreterTool, tool
+from smolagents.agents import PromptTemplates
 
 from src.tools.data_loader import PolarsDataLoaderTool
 from src.tools.data_inspector import DataInspectorTool
 from src.tools.data_profiler import DataProfilerTool
 from src.tools.data_validator import DataValidatorTool
-from src.prompts.system_prompts import DATA_ANALYSIS_TASK_TEMPLATE
+from src.prompts.system_prompts import DATA_ANALYSIS_TASK_TEMPLATE, AGENT_SYSTEM_PROMPT
 from src.formatters.result_formatter import ResultFormatter
 from src.execution.authorized_imports import AUTHORIZED_IMPORTS
 
@@ -75,10 +76,24 @@ class DataAnalysisAgent:
             DataValidatorTool(),  # Validates data quality and provides code recommendations
         ]
 
-        # Initialize agent with authorized imports
+        # Initialize agent with authorized imports and custom system prompt
+        # First create agent with defaults to get default prompt templates
+        temp_agent = CodeAgent(
+            tools=self.tools,
+            model=self.model,
+            max_steps=max_steps,
+            verbosity_level=verbosity_level,
+            additional_authorized_imports=AUTHORIZED_IMPORTS
+        )
+        # Get default templates and override system_prompt
+        prompt_templates = temp_agent.prompt_templates.copy()
+        prompt_templates['system_prompt'] = AGENT_SYSTEM_PROMPT
+
+        # Recreate agent with custom system prompt
         self.agent = CodeAgent(
             tools=self.tools,
             model=self.model,
+            prompt_templates=prompt_templates,
             max_steps=max_steps,
             verbosity_level=verbosity_level,
             additional_authorized_imports=AUTHORIZED_IMPORTS
@@ -147,10 +162,13 @@ class DataAnalysisAgent:
                         f"Waiting {wait_time:.1f}s before retry...[/yellow]"
                     )
                     time.sleep(wait_time)
-                    # Reset agent for next attempt
+                    # Reset agent for next attempt with custom system prompt
+                    prompt_templates = self.agent.prompt_templates.copy()
+                    prompt_templates['system_prompt'] = AGENT_SYSTEM_PROMPT
                     self.agent = CodeAgent(
                         tools=self.tools,
                         model=self.model,
+                        prompt_templates=prompt_templates,
                         max_steps=self.max_steps,
                         verbosity_level=self.verbosity_level,
                         additional_authorized_imports=AUTHORIZED_IMPORTS
