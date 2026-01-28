@@ -35,7 +35,7 @@ class DataAnalysisAgent:
         self,
         model_name: str = "gemini/gemini-2.5-flash",
         api_key: Optional[str] = None,
-        max_steps: int = 8,
+        max_steps: int = 12,
         verbosity_level: int = 1
     ):
         """
