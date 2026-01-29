@@ -31,7 +31,7 @@ class DataValidatorTool(Tool):
             df = pl.read_csv(csv_path, ignore_errors=True)
             n_rows, n_cols = df.shape
 
-            output = ["DATA QUALITY REPORT", "=" * 50, ""]
+            output = ["QUALITY REPORT", ""]
 
             # Check for nulls
             null_cols = []
@@ -42,28 +42,25 @@ class DataValidatorTool(Tool):
                     null_cols.append((col, null_count, pct))
 
             if null_cols:
-                output.append("⚠️  NULL VALUES DETECTED:")
+                output.append("Nulls detected:")
                 for col, count, pct in null_cols:
-                    output.append(f"   {col}: {count} nulls ({pct:.1f}%)")
+                    output.append(f"  {col}: {count} ({pct:.1f}%)")
 
-                output.append("\n✅ RECOMMENDED CODE:")
-                output.append("   # Option 1: Drop rows with nulls")
-                output.append("   df = df.drop_nulls()")
-                output.append("")
-                output.append("   # Option 2: Fill nulls with value")
-                for col, _, _ in null_cols:
+                output.append("\nFix options:")
+                output.append("  df.drop_nulls() OR")
+                for col, _, _ in null_cols[:3]:  # Limit to first 3
                     dtype = str(df[col].dtype)
                     if 'Int' in dtype or 'Float' in dtype:
-                        output.append(f"   df = df.with_columns(pl.col('{col}').fill_null(0))")
+                        output.append(f"  pl.col('{col}').fill_null(0)")
                     else:
-                        output.append(f"   df = df.with_columns(pl.col('{col}').fill_null('Unknown'))")
+                        output.append(f"  pl.col('{col}').fill_null('Unknown')")
                 output.append("")
             else:
-                output.append("✅ No null values - clean dataset!")
+                output.append("No nulls - clean dataset")
                 output.append("")
 
             # Check data types
-            output.append("COLUMN TYPES:")
+            output.append("Column types:")
             numeric_cols = []
             categorical_cols = []
 
@@ -73,28 +70,13 @@ class DataValidatorTool(Tool):
 
                 if 'Int' in dtype or 'Float' in dtype:
                     numeric_cols.append(col)
-                    output.append(f"   {col}: {dtype} (NUMERIC)")
+                    output.append(f"  {col}: {dtype} (NUMERIC)")
                 else:
                     if unique < 20:
                         categorical_cols.append(col)
-                        output.append(f"   {col}: {dtype} (CATEGORICAL, {unique} categories)")
+                        output.append(f"  {col}: {dtype} (CATEGORICAL)")
                     else:
-                        output.append(f"   {col}: {dtype} (TEXT)")
-
-            output.append("")
-            output.append("SUGGESTED ANALYSIS:")
-
-            if numeric_cols:
-                output.append(f"   Numeric columns: {numeric_cols}")
-                output.append("   → Use: df.describe() or df.select(pl.col(numeric_cols).mean())")
-
-            if categorical_cols:
-                output.append(f"   Categorical columns: {categorical_cols}")
-                output.append(f"   → Use: df.group_by('{categorical_cols[0]}').agg(pl.count())")
-
-            if numeric_cols and categorical_cols:
-                output.append(f"\n   Combined analysis:")
-                output.append(f"   → df.group_by('{categorical_cols[0]}').agg(pl.mean('{numeric_cols[0]}'))")
+                        output.append(f"  {col}: {dtype} (TEXT)")
 
             return "\n".join(output)
 

@@ -16,6 +16,7 @@ from src.tools.data_validator import DataValidatorTool
 from src.prompts.system_prompts import DATA_ANALYSIS_TASK_TEMPLATE, AGENT_SYSTEM_PROMPT
 from src.formatters.result_formatter import ResultFormatter
 from src.execution.authorized_imports import AUTHORIZED_IMPORTS
+from src.memory import get_compact_memory_callbacks
 
 
 class DataAnalysisAgent:
@@ -33,7 +34,7 @@ class DataAnalysisAgent:
 
     def __init__(
         self,
-        model_name: str = "gemini/gemini-3-flash",
+        model_name: str = "gemini/gemini-2.5-flash",
         api_key: Optional[str] = None,
         max_steps: int = 12,
         verbosity_level: int = 1
@@ -42,7 +43,7 @@ class DataAnalysisAgent:
         Initialize the data analysis agent.
 
         Args:
-            model_name: LiteLLM model identifier (default: Gemini 3 Flash)
+            model_name: LiteLLM model identifier (default: Gemini 2.5 Flash)
             api_key: Gemini API key (reads from GEMINI_API_KEY env var if not provided)
             max_steps: Maximum agentic steps before stopping
             verbosity_level: 0=silent, 1=normal, 2=verbose
@@ -89,14 +90,15 @@ class DataAnalysisAgent:
         prompt_templates = temp_agent.prompt_templates.copy()
         prompt_templates['system_prompt'] = AGENT_SYSTEM_PROMPT
 
-        # Recreate agent with custom system prompt
+        # Recreate agent with custom system prompt and memory optimization
         self.agent = CodeAgent(
             tools=self.tools,
             model=self.model,
             prompt_templates=prompt_templates,
             max_steps=max_steps,
             verbosity_level=verbosity_level,
-            additional_authorized_imports=AUTHORIZED_IMPORTS
+            additional_authorized_imports=AUTHORIZED_IMPORTS,
+            step_callbacks=get_compact_memory_callbacks()
         )
 
         # Initialize formatter
@@ -162,7 +164,7 @@ class DataAnalysisAgent:
                         f"Waiting {wait_time:.1f}s before retry...[/yellow]"
                     )
                     time.sleep(wait_time)
-                    # Reset agent for next attempt with custom system prompt
+                    # Reset agent for next attempt with custom system prompt and memory optimization
                     prompt_templates = self.agent.prompt_templates.copy()
                     prompt_templates['system_prompt'] = AGENT_SYSTEM_PROMPT
                     self.agent = CodeAgent(
@@ -171,7 +173,8 @@ class DataAnalysisAgent:
                         prompt_templates=prompt_templates,
                         max_steps=self.max_steps,
                         verbosity_level=self.verbosity_level,
-                        additional_authorized_imports=AUTHORIZED_IMPORTS
+                        additional_authorized_imports=AUTHORIZED_IMPORTS,
+                        step_callbacks=get_compact_memory_callbacks()
                     )
                 else:
                     error_msg = f"Analysis failed: {str(e)}"
@@ -242,7 +245,7 @@ def main():
     )
     parser.add_argument(
         "--model",
-        default="gemini/gemini-3-flash",
+        default="gemini/gemini-2.5-flash",
         help="LiteLLM model identifier"
     )
     parser.add_argument(

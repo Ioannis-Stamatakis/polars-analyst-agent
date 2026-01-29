@@ -51,13 +51,13 @@ class DataInspectorTool(Tool):
             for col in df.columns:
                 dtype = str(df[col].dtype)
                 nulls = df[col].null_count()
-                unique = df[col].n_unique()
 
                 # Classify column type
                 if 'Int' in dtype or 'Float' in dtype:
                     numeric_cols.append(col)
                     col_type = "NUMERIC"
                 else:
+                    unique = df[col].n_unique()
                     if unique < 20:  # Low cardinality = likely categorical
                         categorical_cols.append(col)
                         col_type = "CATEGORICAL"
@@ -69,22 +69,21 @@ class DataInspectorTool(Tool):
                     columns_with_nulls.append((col, nulls))
 
                 output_lines.append(
-                    f"  {col}: {dtype} ({col_type}), nulls={nulls}/{n_rows}, unique={unique}"
+                    f"  {col}: {dtype} ({col_type}), nulls={nulls}"
                 )
 
             # Add summary
             output_lines.append("\nSummary:")
-            output_lines.append(f"  Numeric columns: {len(numeric_cols)} → {numeric_cols}")
-            output_lines.append(f"  Categorical columns: {len(categorical_cols)} → {categorical_cols}")
+            output_lines.append(f"  Numeric: {numeric_cols}")
+            output_lines.append(f"  Categorical: {categorical_cols}")
 
             if columns_with_nulls:
-                output_lines.append(f"\n⚠️  Columns with nulls:")
+                output_lines.append(f"\nColumns with nulls:")
                 for col, count in columns_with_nulls:
                     pct = (count / n_rows) * 100
-                    output_lines.append(f"    {col}: {count} nulls ({pct:.1f}%)")
-                output_lines.append("\n💡 Recommendation: Use drop_nulls() or fill_null(0) to handle nulls")
+                    output_lines.append(f"  {col}: {count} ({pct:.1f}%)")
             else:
-                output_lines.append("\n✅ No null values found - clean dataset!")
+                output_lines.append("\nNo nulls - clean dataset")
 
             return "\n".join(output_lines)
 
