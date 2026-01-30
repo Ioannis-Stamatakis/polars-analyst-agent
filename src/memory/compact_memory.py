@@ -25,7 +25,7 @@ def truncate_text(text: str, max_chars: int, suffix: str = "... [truncated]") ->
     return text[:max_chars - len(suffix)] + suffix
 
 
-def compact_memory_callback(step: Any) -> None:
+def compact_memory_callback(step: Any, **kwargs) -> None:
     """
     Callback that truncates observations after each agent step.
 
@@ -35,22 +35,26 @@ def compact_memory_callback(step: Any) -> None:
 
     Args:
         step: ActionStep object from smolagents
+        **kwargs: Additional arguments (agent, etc.) passed by smolagents
     """
     if not hasattr(step, 'observations'):
+        print(f"[MemoryCompact] Step has no 'observations' attribute (type: {type(step).__name__})")
         return
 
     if step.observations:
         original_len = len(str(step.observations))
         # Preserve errors with higher limit for debugging
         if hasattr(step, 'error') and step.error:
-            step.observations = truncate_text(step.observations, max_chars=1200)
+            step.observations = truncate_text(str(step.observations), max_chars=1200)
+            print(f"[MemoryCompact] Truncated error observation: {original_len} → {len(step.observations)} chars")
         else:
             # Normal observations get aggressive truncation
-            step.observations = truncate_text(step.observations, max_chars=800)
-
-        new_len = len(str(step.observations))
-        if original_len > new_len:
-            print(f"[MemoryCompact] Truncated observation: {original_len} → {new_len} chars")
+            step.observations = truncate_text(str(step.observations), max_chars=800)
+            new_len = len(step.observations)
+            if original_len > new_len:
+                print(f"[MemoryCompact] Truncated observation: {original_len} → {new_len} chars")
+    else:
+        print(f"[MemoryCompact] Step {getattr(step, 'step_number', '?')} has empty observations")
 
 
 def get_compact_memory_callbacks() -> list:
