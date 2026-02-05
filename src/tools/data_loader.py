@@ -42,28 +42,36 @@ class PolarsDataLoaderTool(Tool):
             try:
                 df = pl.read_csv(csv_path)
             except Exception as e:
-                # Try with different encodings and separators
-                encodings = ['utf-8', 'latin-1', 'iso-8859-1']
-                separators = [',', ';', '\t', '|']
-
                 df = None
+
+            # If default load produced only 1 column, the separator is likely wrong.
+            # Retry with alternative separators to find the right one.
+            if df is not None and len(df.columns) == 1:
+                df = None
+
+            if df is None:
+                encodings = ['utf-8', 'latin-1', 'iso-8859-1']
+                separators = [';', '\t', '|', ',']
+
                 for encoding in encodings:
                     for sep in separators:
                         try:
-                            df = pl.read_csv(
+                            candidate = pl.read_csv(
                                 csv_path,
                                 encoding=encoding,
                                 separator=sep,
                                 ignore_errors=True
                             )
-                            break
+                            if len(candidate.columns) > 1:
+                                df = candidate
+                                break
                         except:
                             continue
                     if df is not None:
                         break
 
                 if df is None:
-                    return f"ERROR: Could not load CSV with various encoding/separator combinations. Original error: {str(e)}"
+                    return f"ERROR: Could not load CSV with various encoding/separator combinations."
 
             # Get basic info
             n_rows, n_cols = df.shape

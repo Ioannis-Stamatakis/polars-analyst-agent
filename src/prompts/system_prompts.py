@@ -39,6 +39,7 @@ KEY RULES FOR POLARS:
 - Load: df = pl.read_csv("exact/path/from/task.csv")
 - Nulls: Use drop_nulls() OR fill_null(value) - NOT fill_null(pl.col())
 - Group by: df.group_by("col").agg(pl.mean("col2"))
+- Use pl.len() NOT pl.count() — pl.count() is deprecated since Polars 0.20.5
 - Common errors to AVOID:
   * DON'T: df.with_columns(pl.col("x").fill_null(mean_val))
   * DO: df.with_columns(pl.col("x").fill_null(value=mean_val))

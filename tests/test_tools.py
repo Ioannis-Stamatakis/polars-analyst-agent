@@ -98,12 +98,10 @@ class TestDataLoader:
         assert "0 rows" in result
 
     def test_semicolon_csv(self, semicolon_csv):
-        # BUG: pl.read_csv doesn't raise on semicolon files — it loads as 1 column.
-        # Fallback never triggers. Documenting current (broken) behavior.
+        # Loader detects single-column result and retries with alternative separators
         result = PolarsDataLoaderTool().forward(semicolon_csv)
         assert "ERROR" not in result
-        # Currently loads as single string column "x;y;z" instead of 3 columns
-        assert "1 columns" in result
+        assert "3 columns" in result
 
     def test_output_contains_null_counts(self, sales_csv):
         result = PolarsDataLoaderTool().forward(sales_csv)
