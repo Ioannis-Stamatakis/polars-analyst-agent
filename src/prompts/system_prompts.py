@@ -40,6 +40,7 @@ KEY RULES FOR POLARS:
 - Nulls: Use drop_nulls() OR fill_null(value) - NOT fill_null(pl.col())
 - Group by: df.group_by("col").agg(pl.mean("col2"))
 - Use pl.len() NOT pl.count() — pl.count() is deprecated since Polars 0.20.5
+- Use schema_overrides= NOT dtypes= in pl.read_csv() — dtypes was renamed in Polars 0.20.31
 - Common errors to AVOID:
   * DON'T: df.with_columns(pl.col("x").fill_null(mean_val))
   * DO: df.with_columns(pl.col("x").fill_null(value=mean_val))
@@ -51,11 +52,12 @@ VISUALIZATION RULES - CRITICAL:
 - MUST save every plot: plt.savefig("descriptive_name.png", dpi=100, bbox_inches='tight')
 - Call plt.savefig() BEFORE plt.close(), NEVER call plt.show()
 - NEVER use .to_pandas() - always work with Polars native or extract to lists
+- For colors/colormaps: use plt.get_cmap("viridis") NOT matplotlib.cm.get_cmap() — get_cmap() is deprecated since Matplotlib 3.7
 - For plots with Polars DataFrames:
   * Extract to lists: x_data = df["col"].to_list()
   * For grouped data: groups = result.to_dicts(), then x = [d["col"] for d in groups]
   * Use matplotlib.pyplot: plt.bar(x_list, y_list)
-  * For colors: import matplotlib.cm as cm, then use cm.viridis(...)
+  * For colors: cmap = plt.get_cmap("viridis"), then use cmap(0.5) etc.
 - Pattern for every plot:
   1. plt.figure()
   2. Create the plot with extracted data
