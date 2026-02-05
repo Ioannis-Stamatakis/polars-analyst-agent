@@ -51,7 +51,7 @@ class DataProfilerTool(Tool):
 
                 if 'int' in dtype.lower() or 'float' in dtype.lower():
                     numeric_cols.append(col)
-                elif n_unique < min(50, n_rows * 0.05):  # Low cardinality
+                elif n_unique < 20:  # Low cardinality
                     categorical_cols.append(col)
 
             # Numeric analysis

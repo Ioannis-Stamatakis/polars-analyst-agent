@@ -154,8 +154,13 @@ class DataAnalysisAgent:
 
             except Exception as e:
                 error_str = str(e)
-                # Check if it's a 503 overload error
-                is_overload = "503" in error_str or "UNAVAILABLE" in error_str or "overloaded" in error_str.lower()
+                # Check if it's a retryable API error (overload or empty response)
+                is_overload = (
+                    "503" in error_str
+                    or "UNAVAILABLE" in error_str
+                    or "overloaded" in error_str.lower()
+                    or "returned no choices" in error_str.lower()
+                )
 
                 if is_overload and attempt < max_retries:
                     wait_time = retry_delay * (2 ** attempt)  # Exponential backoff
